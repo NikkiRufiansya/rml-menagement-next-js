@@ -1,0 +1,100 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            Int         @id @default(autoincrement())
+    nama          String
+    email         String
+    password      String
+    jenis_kelamin String
+    no_tlpn       String
+    alamat        String
+    role_id       Int         @unique
+    role          Role        @relation(fields: [role_id], references: [id])
+    customer      Customer?
+    lisensi       Lisensi?
+    tiketing      Tikecting?
+    AgendaPoc     AgendaPoc[]
+}
+
+model Role {
+    id   Int    @id @default(autoincrement())
+    name String
+    user User?
+}
+
+model Product {
+    id        Int        @id @default(autoincrement())
+    name      String
+    image     String
+    email     String
+    lisensi   Lisensi?
+    tikecting Tikecting?
+    AgendaPoc AgendaPoc?
+}
+
+model Customer {
+    id        Int        @id @default(autoincrement())
+    name      String
+    alamat    String
+    no_tlpn   String
+    user_id   Int        @unique
+    user      User       @relation(fields: [user_id], references: [id])
+    lisensi   Lisensi?
+    Tikecting Tikecting?
+    AgendaPoc AgendaPoc?
+}
+
+model Lisensi {
+    id          Int        @id @default(autoincrement())
+    customer_id Int        @unique
+    customer    Customer   @relation(fields: [customer_id], references: [id])
+    product_id  Int        @unique
+    product     Product    @relation(fields: [product_id], references: [id])
+    lisensi     String
+    start       DateTime
+    expired     DateTime
+    support     String
+    user_id     Int        @unique
+    user        User       @relation(fields: [user_id], references: [id])
+    Tikecting   Tikecting?
+}
+
+model Tikecting {
+    id           Int      @id @default(autoincrement())
+    title        String
+    subject      String
+    from         String
+    description  String   @db.LongText
+    ticket_open  DateTime
+    ticket_close DateTime
+    product_id   Int      @unique
+    product      Product  @relation(fields: [product_id], references: [id])
+    user_id      Int      @unique
+    user         User     @relation(fields: [user_id], references: [id])
+    customer_id  Int      @unique
+    customer     Customer @relation(fields: [customer_id], references: [id])
+    lisensi_id   Int      @unique
+    lisensi      Lisensi  @relation(fields: [lisensi_id], references: [id])
+    status       Boolean  @default(true)
+}
+
+model AgendaPoc {
+    id          Int      @id @default(autoincrement())
+    title       String
+    tipe        String
+    start       DateTime
+    end         DateTime
+    product_id  Int      @unique
+    product     Product  @relation(fields: [product_id], references: [id])
+    customer_id Int      @unique
+    customer    Customer @relation(fields: [customer_id], references: [id])
+    user_id     Int
+    user        User     @relation(fields: [user_id], references: [id])
+}
